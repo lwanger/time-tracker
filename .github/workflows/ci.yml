@@ -31,7 +31,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: astral-sh/setup-uv@v10
+      # Pinned to an exact version, unlike checkout: setup-uv stopped publishing a
+      # floating major tag after v7.x, so `@v10` is not a ref that exists and the
+      # job fails before it starts. Bump it deliberately.
+      - uses: astral-sh/setup-uv@v10.0.0
         with:
           python-version: ${{ matrix.python-version }}
           enable-cache: true
@@ -50,7 +53,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.0.0
         with:
           python-version: "3.13"
           enable-cache: true
