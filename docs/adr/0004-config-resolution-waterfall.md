@@ -18,8 +18,8 @@ unchanged while also giving a way to override config for a single run.
 ## Considered options
 
 **A bare `~/.env`** as the user-global file. Rejected because `find_dotenv` matches any
-file named `.env` in any ancestor directory, and `C:\Users\len_w` is an ancestor of
-essentially everything. A `.env` there would be silently loaded by every other
+file named `.env` in any ancestor directory, and the home directory is an ancestor of
+essentially everything you work in. A `.env` there would be silently loaded by every other
 dotenv-using project below it, and any unrelated tool's stray `~/.env` would be loaded
 into Time Tracker. The `TT_` prefix stops the *variables* colliding but not the *file* being
 read by the wrong tool. `~/.time-tracker/.env` is invisible to `find_dotenv` (it only matches

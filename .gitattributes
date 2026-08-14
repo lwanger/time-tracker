@@ -1,0 +1,27 @@
+# Line endings and binary handling.
+#
+# Without this file, what lands in a commit depends on each contributor's local
+# core.autocrlf setting, which is how a repository ends up with the same file
+# committed twice in two spellings and a diff that touches every line.
+
+# Store every text file with LF, and check it out with LF too. The `eol=lf` half is
+# deliberate rather than the usual `native`: this project's tests run on Linux and
+# macOS in CI, the working tree is already LF, and keeping checkout, index and CI
+# byte-identical removes the whole class of "works on my machine" line-ending bug.
+# Every editor on Windows has handled LF for years.
+* text=auto eol=lf
+
+# Shell scripts would break outright with CRLF - bash reads the carriage return as
+# part of the interpreter path - so this one is not merely a preference.
+*.sh text eol=lf
+
+# Binary: never normalise, never diff as text. The .xlsx files matter most here -
+# they are zip containers, and rewriting bytes inside one corrupts the workbook.
+*.ico  binary
+*.png  binary
+*.pdf  binary
+*.xlsx binary
+
+# Generated and resolved by `uv lock`, not written by hand. Marking it collapses the
+# file in pull-request diffs, where it is noise, without excluding it from review.
+uv.lock linguist-generated=true
