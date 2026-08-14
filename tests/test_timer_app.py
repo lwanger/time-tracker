@@ -6,6 +6,17 @@ formatting / computation / CLI-resolution logic the view delegates to.
 
 import datetime
 
+import pytest
+
+
+# tkinter is stdlib but not always installed: Debian and Ubuntu split it into
+# python3-tk, Homebrew into python-tk@X.Y, and a Python built without Tk has no
+# _tkinter at all. Importing timer_app therefore fails outright on some perfectly
+# good Linux and macOS installs, which is a fact about the platform rather than a
+# breakage - so skip the module instead of erroring during collection. Only the
+# GUI is affected; the time-tracker CLI never imports timer_app.
+pytest.importorskip("tkinter", reason="tkinter is not installed for this interpreter")
+
 import timer_app
 
 

@@ -37,6 +37,23 @@ printing it. The reasoning, including why LibreOffice was not used as a fallback
 `pywin32` is only installed on Windows (it is declared with an environment marker), so
 nothing about the install is Windows-specific either.
 
+### The timer GUI needs tkinter
+
+`timer-app` is a tkinter application. tkinter is part of the standard library, but it
+is not always *installed* — several distributions package it separately, and a Python
+built without Tk has no `_tkinter` at all. Windows and macOS python.org installers
+include it; these do not, by default:
+
+| Where | Install it with |
+| --- | --- |
+| Debian / Ubuntu | `sudo apt install python3-tk` |
+| Fedora | `sudo dnf install python3-tkinter` |
+| Homebrew | `brew install python-tk@3.13` (match your Python version) |
+
+This affects **only** the timer GUI. The `time-tracker` CLI never imports `timer_app`,
+so every command works on a Python with no Tk at all; the timer's own tests skip
+themselves rather than fail there.
+
 ## Known limitations
 
 * **PDF export needs Excel on Windows**, as above. Everything else is pure Python.
@@ -52,6 +69,8 @@ nothing about the install is Windows-specific either.
 * **An invoice cannot be voided or reissued.** A number that already appears in the
   invoice log is a hard error, and there is no command to undo one
   (`docs/adr/0002-invoice-number-hard-error-void-deferred.md`).
+* **The timer GUI needs tkinter installed**, which several Linux and macOS Python
+  packages leave out — see [Platform support](#platform-support). The CLI does not.
 * **The timer GUI's window is verified by hand.** Its pure helpers are unit-tested;
   the tkinter view is not (see [Coverage](#coverage)).
 

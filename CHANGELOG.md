@@ -78,6 +78,9 @@ entry covers every change since 0.3.0 rather than only the work done to publish.
   `docs/adr/0008-cross-platform-with-windows-only-pdf.md`.
 - **`pywin32` is now a Windows-only dependency**, declared with an environment marker,
   and imported inside the one function that uses it.
+- **The timer GUI requires tkinter to be installed**, which Debian, Ubuntu, Fedora and
+  Homebrew all package separately from Python itself. The CLI does not import it, so
+  every command works without Tk; only `timer-app` needs it. See the README.
 - **The GUI is `Time Tracker Timer`.** The `LPC` product branding is retired from
   everything user-visible; the icon files are now `timer.ico` and `assets/**/timer-*.png`.
   `docs/adr/0006-mit-license-and-copyright-holder.md` carries an amendment note.
