@@ -1,0 +1,22 @@
+{
+  "TEST": {
+    "rate_hr": 100,
+    "company": "FakeCo",
+    "phone": "(123) 456-8900",
+    "contact": "Fake Client",
+    "addr1": "Fake addr1",
+    "addr2": "Fake City, FS 00000",
+    "rate_day": 800
+  },
+  "RET": {
+    "rate_hr": 100,
+    "company": "Retainer Corp",
+    "phone": "(555) 000-0001",
+    "contact": "Retainer Contact",
+    "addr1": "100 Retainer Blvd",
+    "addr2": "Chicago, IL 60601",
+    "rate_day": 800,
+    "retainer_hrs": 20,
+    "retainer_rate": 1500
+  }
+}

@@ -1,0 +1,7 @@
+Start,End,Elapsed,Client,Status,Notes
+2026-05-01T09:00:00,2026-05-01T11:30:00,150,TEST,billed,Initial project kickoff
+2026-05-03T13:00:00,2026-05-03T15:00:00,120,TEST,billed,Requirements gathering
+2026-05-06T09:30:00,2026-05-06T12:00:00,150,RET,billed,Architecture design
+2026-05-10T14:00:00,2026-05-10T17:00:00,180,TEST,billed,Development sprint
+2026-05-15T10:00:00,2026-05-15T11:00:00,60,TEST,billed,Client review call
+2026-05-17T10:00:00,2026-05-17T12:30:00,150,RET,billed,Wasting time and doing nothing!

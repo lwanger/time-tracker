@@ -1,0 +1,178 @@
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+norecursedirs = ["bak", ".venv", ".venv_laptop"]
+
+[tool.ruff]
+# Where first-party code lives, so `conftest` and the time_tracker_* modules sort as
+# first-party rather than third-party. No `select` list: ruff's default rule set is the
+# baseline, and the dev group below pins ruff to a minor line so it cannot drift.
+src = [".", "tests"]
+
+[tool.ruff.lint]
+# extend-select, not select: the default rule set is the baseline and must survive.
+# ty has no equivalent of mypy's --disallow-untyped-defs, so it can tell us an
+# annotation is wrong but never that one is missing. ANN is the half ty cannot do.
+extend-select = ["ANN"]
+ignore = [
+    # Every datetime here is deliberate local wall-clock time. The time log stores naive
+    # ISO timestamps (2026-05-01T09:00:00) and invoices are dated by the user's own
+    # calendar; attaching tzinfo would change the on-disk log format for no gain.
+    "DTZ001",
+    "DTZ005",
+    "DTZ011",
+    # ANN401 bans `Any`. A client record is a hand-edited JSON object and a template
+    # variable holds whatever the invoice asks for, so dict[str, Any] is the honest
+    # annotation here rather than a placeholder for a type nobody has written yet.
+    "ANN401",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Annotations on test functions buy little: pytest calls them, nothing else does, and
+# the fixtures they take are typed by conftest already.
+"tests/*" = ["ANN"]
+
+[tool.ruff.lint.isort]
+# Match the two blank lines this codebase leaves after every import block.
+lines-after-imports = 2
+
+# Checked with ty rather than mypy: it is what cooked_input (this project's own upstream
+# dependency, same author) already gates on, so one toolchain covers both. It is pre-1.0,
+# which is why the pin below is exact.
+[tool.ty.environment]
+# The floor, not the version CI happens to run. ty would infer this from requires-python,
+# but stating it means a change to one does not silently move the other.
+python-version = "3.12"
+
+[tool.ty.src]
+# Typer leaves an OptionInfo object in place of a default when a command is called
+# directly as a function, which is exactly what these tests do - so the argument types
+# a checker sees there are not the types the CLI ever passes.
+exclude = ["tests"]
+
+[tool.ty.rules]
+# time_tracker_invoice.export_pdf suppresses unresolved-import on both win32 imports.
+# Off Windows neither module exists, so both suppressions are used; on Windows
+# win32com.client resolves and its suppression does not. One of the two is unused on
+# whichever platform you are standing on, so the check itself cannot be kept.
+unused-ignore-comment = "ignore"
+
+[tool.coverage.run]
+source = [
+    "time_tracker",
+    "time_tracker_cli",
+    "time_tracker_client_form",
+    "time_tracker_client_record",
+    "time_tracker_clients",
+    "time_tracker_config",
+    "time_tracker_init",
+    "time_tracker_invoice",
+    "time_tracker_invoice_log",
+    "time_tracker_invoices",
+    "time_tracker_json",
+    "time_tracker_template",
+    "time_tracker_time",
+    "time_tracker_time_log",
+    "tools",
+]
+omit = ["tests/*", "bak/*"]
+
+[tool.coverage.report]
+exclude_also = [
+    "if __name__ == .__main__.:",
+]
+
+[project]
+name = "time-tracker"
+version = "1.0.0"
+description = "Track billable time and generate client invoices from the command line."
+readme = "README.md"
+# PEP 639: an SPDX expression, not the deprecated License:: classifier. setuptools
+# rejects the two together from 77.0.0, which is why the build floor moved.
+license = "MIT"
+license-files = ["LICENSE"]
+# 3.12 is what Ubuntu 24.04 LTS and most Homebrew installs have, and nothing here needs
+# anything newer, so the cross-platform claim is usable rather than nominal.
+requires-python = ">=3.12"
+# The operating systems and Python versions the CI matrix actually runs. Windows is
+# listed first because it is the only one where `invoice` can render its PDF - see
+# docs/adr/0008-cross-platform-with-windows-only-pdf.md.
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Office/Business :: Financial :: Accounting",
+]
+dependencies = [
+    "cooked-input==0.7.0",
+    "dateparser",
+    "openpyxl==3.1.5",
+    "prettytable",
+    # Windows-only: pywin32 is how `invoice` renders a PDF through Excel. Everywhere
+    # else the command writes the .xlsx alone (see time_tracker_invoice.export_pdf).
+    "pywin32==311; sys_platform == 'win32'",
+    "python-dotenv",
+    "typer",
+]
+
+# Development-only tooling. ruff is pinned to a minor line because ruff changes its
+# default rule set on minor releases, and [tool.ruff] above inherits those defaults.
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    # Floored, not pinned: the value of an audit is the freshest advisory data.
+    "pip-audit>=2.7",
+    "ruff>=0.16,<0.17",
+    # Pinned exactly, not floored: ty is pre-1.0 and its diagnostics change between
+    # releases, so an unpinned checker would turn CI red on someone else's schedule.
+    # Bump it deliberately, as its own commit.
+    "ty==0.0.71",
+]
+
+[project.urls]
+Homepage = "https://github.com/lwanger/time-tracker"
+Repository = "https://github.com/lwanger/time-tracker"
+Changelog = "https://github.com/lwanger/time-tracker/blob/main/CHANGELOG.md"
+
+[project.scripts]
+time-tracker = "time_tracker:main"
+# Short alias for the same entry point, pairing with the TT_ config prefix.
+tt = "time_tracker:main"
+timer-app = "timer_app:app"
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = [
+    "time_tracker",
+    "time_tracker_cli",
+    "time_tracker_client_form",
+    "time_tracker_client_record",
+    "time_tracker_clients",
+    "time_tracker_config",
+    "time_tracker_init",
+    "time_tracker_invoice",
+    "time_tracker_invoice_log",
+    "time_tracker_invoices",
+    "time_tracker_json",
+    "time_tracker_template",
+    "time_tracker_time",
+    "time_tracker_time_log",
+    "timer_app",
+]
+# A package (not just data files) so the shipped template can be located with
+# importlib.resources, which works the same from a source checkout and from an
+# installed tool. See docs/adr/0003-self-describing-invoice-template.md.
+packages = ["time_tracker_templates"]
+
+[tool.setuptools.package-data]
+time_tracker_templates = ["*.xlsx", "*.json"]

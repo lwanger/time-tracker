@@ -1,0 +1,68 @@
+# Environment / secrets
+.env
+*.env
+# ...except the two committed example configs. Both are part of the checkout - the
+# run configurations use them and docs/adr/0004 refers to them - so they must be
+# re-included, or a fresh `git add -A` would silently leave them behind.
+!tests/.env
+!docs/.env
+
+# Private working notes, none of them part of the published project. CLAUDE.md and
+# TODO.md are working documents; RELEASE_PLAN_1.0.md additionally records what this
+# repository's history contains, so it must never reach the public repository.
+CLAUDE.md
+TODO.md
+RELEASE_PLAN_1.0.md
+
+# Personal working files - carry identifying business information. The canonical,
+# placeholder-only template ships in time_tracker_templates/.
+LPC *.xlsx
+
+# Real invoices and time logs written by a default (relative) configuration. Named
+# precisely rather than by filename pattern, so the deliberately tracked
+# docs/Invoice 10* examples are not caught by them.
+/invoices/
+/time_logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.venv_laptop/
+
+# Coverage
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+*.swp
+
+# Generated test invoices, and whatever a test run writes into the log directory.
+# The one committed time log is the working copy the manual run configurations use;
+# restore_test_data.sh copies it back from tests/bak after a run has edited it, so
+# it has to be in the checkout for that to have anywhere to restore to.
+tests/data/*.pdf
+tests/data/*.xlsx
+tests/data/time_logs/*
+!tests/data/time_logs/test_time_log.csv
+
+# Build / dist
+dist/
+*.egg-info/
+
+# Bak directories
+bak/
+
+# ...except tests/bak, which is not scratch: it holds the pristine fixtures that
+# tests/restore_test_data.sh copies back into tests/data. Both rules are needed -
+# the first re-includes the directory, which git would otherwise never look
+# inside, and the second its contents. Compiled bytecode stays ignored, since the
+# re-include would otherwise beat the __pycache__ rule above (last match wins).
+!tests/bak/
+!tests/bak/**
+tests/bak/__pycache__/
+
+# Backups written by tools/repair_template_external_links.py
+*.xlsx.bak

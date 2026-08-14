@@ -1,0 +1,79 @@
+# Written before the repository existed: nothing here has run yet, and the first run
+# happens on the initial push (release plan, phase 4). Expect to fix it then rather than
+# to trust it. Its first green matrix is also what closes the one acceptance criterion
+# deferred out of phase 0 - that cooked_input installs cleanly on Linux and macOS.
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Supersede in-flight runs for the same branch rather than queueing them.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: py${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Which platforms fail, and how, is the whole question this matrix exists to
+      # answer - so one red job must not cancel the eight that would answer the rest.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+
+      # --locked fails the job if uv.lock no longer matches pyproject.toml, so a
+      # dependency edited without re-locking cannot reach a green run.
+      - name: Install the project and its dev dependencies
+        run: uv sync --locked
+
+      - name: Run the tests
+        run: uv run pytest -q
+
+  checks:
+    name: lint, types, coverage, audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install the project and its dev dependencies
+        run: uv sync --locked
+
+      # Ruff first: "this function has no annotation" is the more actionable failure,
+      # and ty has no equivalent check. ty then verifies the annotations that exist.
+      - name: Check style and that annotations exist
+        run: uv run ruff check --output-format=github
+
+      - name: Check that annotations are correct
+        run: uv run ty check --output-format=github
+
+      # A ratchet, not a target: 100% today, and the floor only moves up. Kept out of
+      # the matrix so it does not slow the nine jobs that are about portability.
+      - name: Check coverage
+        run: uv run pytest --cov --cov-fail-under=99
+
+      # The runtime dependencies only - a vulnerability in pytest is not something a
+      # user of this tool is exposed to.
+      - name: Audit dependencies for known vulnerabilities
+        run: |
+          uv export --format requirements-txt --no-dev --no-emit-project --output-file requirements-audit.txt
+          uv run pip-audit -r requirements-audit.txt
