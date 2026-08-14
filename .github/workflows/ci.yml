@@ -1,7 +1,8 @@
-# Written before the repository existed: nothing here has run yet, and the first run
-# happens on the initial push (release plan, phase 4). Expect to fix it then rather than
-# to trust it. Its first green matrix is also what closes the one acceptance criterion
-# deferred out of phase 0 - that cooked_input installs cleanly on Linux and macOS.
+# First went green on 2026-08-14, across all nine platform/version combinations, which
+# is what the cross-platform claim in the README rests on. Three things it caught that
+# no amount of local testing on Windows could have: setup-uv publishes no floating major
+# tag, a config test asserted Windows path semantics unconditionally, and tkinter is
+# absent from several perfectly ordinary Linux and macOS Python installs.
 name: ci
 
 on:

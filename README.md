@@ -1,5 +1,10 @@
 # Time Tracker
 
+[![CI](https://img.shields.io/github/actions/workflow/status/lwanger/time-tracker/ci.yml?branch=main&label=CI)](https://github.com/lwanger/time-tracker/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-blue)](https://github.com/lwanger/time-tracker/blob/main/pyproject.toml)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)](#platform-support)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 *Time Tracker* is a Python CLI tool for tracking time and creating monthly client invoices.
 Time is logged via CLI commands (*add-time*), or the included *timer-app* GUI tool. 
 Invoices are generated as Excel spreadsheets and exported to PDF, with invoices are 
