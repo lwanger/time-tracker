@@ -9,6 +9,7 @@ of trusting fixtures.
 """
 
 import re
+import sys
 from pathlib import Path
 from unittest.mock import patch
 
@@ -99,9 +100,21 @@ def _init_inputs(tmp_path: Path) -> tuple:
     return paths, files
 
 
+@pytest.mark.skipif(
+    sys.platform != "win32",
+    reason=(
+        "Separator tolerance is a Windows-only question. On POSIX a backslash is an "
+        "ordinary filename character, so these name two different files and comparing "
+        "them unequal is the correct answer rather than a bug to work around."
+    ),
+)
 def test_same_setting_tolerates_path_spelling() -> None:
     """os.path.join yields a backslash where a hand-written .env has a slash."""
     assert time_tracker_init._same_setting("C:/data\\clients.json", "C:/data/clients.json")
+
+
+def test_same_setting_rejects_a_genuinely_different_value() -> None:
+    """The other half of the contract, and true on every platform."""
     assert not time_tracker_init._same_setting("180", "240")
 
 

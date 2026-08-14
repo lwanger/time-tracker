@@ -708,7 +708,8 @@ in `pyproject.toml`):
 uv run pytest --cov --cov-report=term-missing
 ```
 
-Current coverage (447 tests passing):
+Current coverage (448 tests passing, counted on Python 3.14 — statement totals shift
+by a few between interpreter versions, so the percentages are the stable part):
 
 | Module | Statements | Missing | Coverage |
 | --- | ---: | ---: | ---: |

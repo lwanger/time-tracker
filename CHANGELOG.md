@@ -139,7 +139,9 @@ These are not user-visible, but they are why the release is trusted.
   3.12, 3.13 and 3.14, installed from the lockfile with `uv sync --locked`. A separate
   job gates `ruff check` (including missing annotations), `ty check`, coverage, and
   `pip-audit` over the runtime dependencies.
-- **447 tests, 100% coverage** of the measured modules, up from 370 at 99%.
+- **448 tests, 100% coverage** of the measured modules, up from 370 at 99%. One is
+  Windows-only and skips elsewhere: it asserts that a backslash and a forward slash
+  spell the same path, which is true only where the backslash is a separator.
 - **Two contract tests**, both written after something changed underneath the suite
   without a single test noticing: one parametrizes over every settable configuration
   key, the other binds every real `cooked_input` call site in the source against the

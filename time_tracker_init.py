@@ -279,6 +279,12 @@ def _same_setting(current: Any, other: Any) -> bool:
     ``os.path.join`` produces ``dir\\clients.json`` where a hand-written .env has
     ``dir/clients.json``; these name the same file and must not be treated as a
     customization worth writing out.
+
+    That tolerance is Windows-only, and deliberately so: on POSIX a backslash is an
+    ordinary filename character, ``Path`` does not treat it as a separator, and the
+    two spellings really are two different files. The case cannot arise there
+    anyway, since ``os.path.join`` yields a forward slash on POSIX and the plain
+    string comparison already matches.
     """
     # Path comparison normalizes separators. Both arguments are stringified first,
     # and Path() accepts any string, so this cannot raise on odd input - a value
